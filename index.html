@@ -6,6 +6,7 @@
     <title>Ricardo Capel | Merigus Player</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* --- ESTILOS VISUAIS (Glassmorphism & Responsivo) --- */
         :root {
             --bg-color: #121212;
             --card-color: #181818;
@@ -30,26 +31,26 @@
             background-image: radial-gradient(circle at 50% 30%, rgba(29,185,84,0.15) 0%, #121212 70%);
         }
 
-        /* --- CONTAINER PRINCIPAL (A "Caixa" que segura tudo) --- */
+        /* Container Principal */
         .main-wrapper {
             display: flex;
-            flex-direction: row; /* Padrão Desktop: Lado a Lado */
-            gap: 0; /* Removemos gap para unir visualmente */
+            flex-direction: row;
+            gap: 0;
             width: 90%;
             max-width: 900px;
-            height: 550px; /* Altura fixa para harmonia no desktop */
+            height: 550px;
             background-color: var(--card-glass);
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-            overflow: hidden; /* Garante que nada saia das bordas arredondadas */
-            backdrop-filter: blur(10px); /* Efeito vidro */
+            overflow: hidden;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* --- LADO ESQUERDO: LISTA --- */
+        /* Barra Lateral (Playlist) */
         .playlist-sidebar {
             flex: 1;
-            background-color: rgba(0,0,0,0.2); /* Um pouco mais escuro que o player */
+            background-color: rgba(0,0,0,0.2);
             padding: 25px;
             display: flex;
             flex-direction: column;
@@ -70,77 +71,40 @@
         }
 
         .playlist-items {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
+            list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1;
         }
-
-        /* Scrollbar fina e moderna */
+        /* Scrollbar fina */
         .playlist-items::-webkit-scrollbar { width: 4px; }
         .playlist-items::-webkit-scrollbar-thumb { background-color: #444; border-radius: 4px; }
 
         .playlist-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            margin-bottom: 5px;
+            display: flex; align-items: center; padding: 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; margin-bottom: 5px;
         }
-
         .playlist-item:hover { background-color: rgba(255,255,255,0.05); }
-
-        .playlist-item.active-song {
-            background-color: rgba(29, 185, 84, 0.1); /* Verde bem suave */
-            border-left: 3px solid var(--accent-color);
-        }
-
-        .item-icon {
-            font-size: 0.8rem;
-            color: var(--accent-color);
-            margin-right: 12px;
-            opacity: 0; 
-            width: 15px;
-        }
+        .playlist-item.active-song { background-color: rgba(29, 185, 84, 0.1); border-left: 3px solid var(--accent-color); }
+        .item-icon { font-size: 0.8rem; color: var(--accent-color); margin-right: 12px; opacity: 0; width: 15px; }
         .playlist-item.active-song .item-icon { opacity: 1; }
         .playlist-item.active-song .item-title { color: var(--accent-color); }
-
         .item-info { display: flex; flex-direction: column; overflow: hidden; }
         .item-title { font-size: 0.9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-artist { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
 
-        /* --- LADO DIREITO: PLAYER --- */
+        /* Área do Player */
         .player-container {
-            width: 380px; /* Largura fixa no desktop */
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
+            width: 380px; padding: 30px; display: flex; flex-direction: column; justify-content: center; position: relative;
         }
 
         .cover-area {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
-            position: relative;
+            width: 100%; aspect-ratio: 1; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 25px; position: relative;
         }
-
         .cover-area img { width: 100%; height: 100%; object-fit: cover; }
 
         .song-info-player { text-align: center; margin-bottom: 20px; }
         .song-title-main { font-size: 1.3rem; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .artist-name-main { color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; }
 
-        .progress-area {
-            height: 5px; width: 100%; background: #4f4f4f; border-radius: 50px; cursor: pointer; margin-bottom: 8px; transition: height 0.2s;
-        }
+        /* Barra de Progresso */
+        .progress-area { height: 5px; width: 100%; background: #4f4f4f; border-radius: 50px; cursor: pointer; margin-bottom: 8px; transition: height 0.2s; }
         .progress-area:hover { height: 8px; }
         .progress-bar { height: 100%; width: 0%; background: var(--text-primary); border-radius: 50px; position: relative; }
         .playing .progress-bar { background: var(--accent-color); }
@@ -148,119 +112,58 @@
         .progress-area:hover .progress-bar::after { opacity: 1; }
 
         .timers { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 20px; }
-
+        
+        /* Controles */
         .controls { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
         .btn { background: none; border: none; color: var(--text-secondary); font-size: 1.1rem; cursor: pointer; transition: 0.2s; position: relative; }
         .btn:hover { color: var(--text-primary); transform: scale(1.1); }
         .btn.active { color: var(--accent-color); }
         .btn.active::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: var(--accent-color); border-radius: 50%; }
-
         .btn-main { width: 55px; height: 55px; background-color: var(--text-primary); color: #000; border-radius: 50%; font-size: 1.4rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .btn-main:hover { transform: scale(1.05); background-color: var(--accent-hover); color: #000; }
 
-        /* --- POPUP DE LETRAS (NOVIDADE) --- */
+        /* Popup de Letras */
         .lyrics-popup {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Fundo escuro transparente */
-            backdrop-filter: blur(8px);
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none; /* Não clica quando invisível */
-            transition: opacity 0.3s ease;
-            padding: 30px;
-            box-sizing: border-box;
-            border-radius: 20px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
+            z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 30px; box-sizing: border-box; border-radius: 20px;
         }
-
         .lyrics-popup.show { opacity: 1; pointer-events: auto; }
-
         .lyrics-content {
-            text-align: center;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #ddd;
-            overflow-y: auto;
-            max-height: 80%;
-            width: 100%;
-            white-space: pre-wrap; /* Respeita as quebras de linha */
+            text-align: center; font-size: 1.1rem; line-height: 1.6; color: #ddd;
+            overflow-y: auto; max-height: 80%; width: 100%; white-space: pre-wrap;
             mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
-
-        .close-lyrics {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
+        .close-lyrics { margin-top: 20px; background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
         .close-lyrics:hover { background: rgba(255,255,255,0.2); }
 
-
-        /* --- RESPONSIVIDADE (MOBILE) --- */
+        /* Media Queries (Mobile) */
         @media (max-width: 850px) {
-            body { align-items: flex-start; padding-top: 20px; } /* Descola do topo */
-            
-            .main-wrapper {
-                flex-direction: column; /* Empilha verticalmente */
-                height: auto; /* Altura livre */
-                width: 90%;
-                margin-bottom: 20px;
-                border-radius: 20px; /* Mantém arredondado */
-            }
-
-            .player-container {
-                width: 100%; /* Ocupa tudo */
-                order: 1; /* Player aparece PRIMEIRO */
-                padding: 25px;
-                box-sizing: border-box;
-                border-bottom: 1px solid rgba(255,255,255,0.05);
-            }
-
-            .playlist-sidebar {
-                width: 100%;
-                order: 2; /* Lista aparece EM BAIXO */
-                height: 300px; /* Altura fixa para a lista no mobile */
-                border-right: none;
-                box-sizing: border-box;
-            }
+            body { align-items: flex-start; padding-top: 20px; }
+            .main-wrapper { flex-direction: column; height: auto; width: 90%; margin-bottom: 20px; border-radius: 20px; }
+            .player-container { width: 100%; order: 1; padding: 25px; box-sizing: border-box; border-bottom: 1px solid rgba(255,255,255,0.05); }
+            .playlist-sidebar { width: 100%; order: 2; height: 300px; border-right: none; box-sizing: border-box; }
         }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    
     <div class="playlist-sidebar">
-        <div class="playlist-header">
-            <i class="fas fa-list-ul" style="margin-right: 10px;"></i> Playlist
-        </div>
-        <ul class="playlist-items" id="playlist-ul">
-            </ul>
+        <div class="playlist-header"><i class="fas fa-list-ul" style="margin-right: 10px;"></i> Playlist</div>
+        <ul class="playlist-items" id="playlist-ul"></ul>
     </div>
 
     <div class="player-container" id="player">
         
         <div class="lyrics-popup" id="lyrics-popup">
-            <div class="lyrics-content" id="lyrics-text">
-                Carregando letra...
-            </div>
+            <div class="lyrics-content" id="lyrics-text">Carregando letra...</div>
             <button class="close-lyrics" id="close-lyrics">Fechar</button>
         </div>
 
-        <div class="cover-area">
-            <img src="" alt="Capa" id="cover">
-        </div>
+        <div class="cover-area"><img src="" alt="Capa" id="cover"></div>
 
         <div class="song-info-player">
             <h2 class="song-title-main" id="title">Carregando...</h2>
@@ -277,66 +180,61 @@
 
         <div class="controls">
             <button class="btn" id="lyrics-btn" title="Ver Letra"><i class="fas fa-microphone-lines"></i></button>
-            
             <button class="btn" id="prev"><i class="fas fa-step-backward"></i></button>
             <button class="btn btn-main" id="play"><i class="fas fa-play"></i></button>
             <button class="btn" id="next"><i class="fas fa-step-forward"></i></button>
-            
             <button class="btn" id="shuffle" title="Aleatório"><i class="fas fa-shuffle"></i></button>
         </div>
     </div>
-
 </div>
 
 <audio id="audio"></audio>
 
 <script>
-    // --- DADOS DAS MÚSICAS COM LETRAS ---
-    // Adicione a letra dentro do campo "lyrics" usando \n para pular linha
+    // --- LISTA DE MÚSICAS ---
+    // Todas agora usam "musicas/album_cover.jpeg"
     const songs = [
         {
             "title": "I Walk The Shadows... Of A Sunless Day (V1)",
             "artist": "Ricardo Capel",
             "src": "musicas/I walk the shadows... of a sunless day (V1).mp3",
-            "cover": "musicas/capa_shadows.jpg",
-            "lyrics": "Essa é a letra da música Shadows V1.\n\nEscuridão profunda...\nCaminhando sozinho...\n(Cole aqui a letra completa se quiser)"
+            "cover": "musicas/album_cover.jpeg", 
+            "lyricsFile": "musicas/I walk_v1.txt"
         },
         {
             "title": "I Walk The Shadows... Of A Sunless Day (V2)",
             "artist": "Ricardo Capel",
             "src": "musicas/I walk the shadows... of a sunless day (V2).mp3",
-            "cover": "musicas/capa_shadows.jpg",
-            "lyrics": "Versão 2 da música...\nMais rápida e intensa!\n\nHeavy metal na veia..."
+            "cover": "musicas/album_cover.jpeg",
+            "lyricsFile": "musicas/I walk_v2.txt"
         },
         {
             "title": "The Pain Is Real (V1)",
             "artist": "Ricardo Capel",
             "src": "musicas/The pain is real (V1).mp3",
-            "cover": "musicas/capa_pain.jpg",
-            "lyrics": "The pain is real...\nSinto a dor...\n\nSolo de guitarra!!!"
+            "cover": "musicas/album_cover.jpeg",
+            "lyricsFile": "musicas/The pain_v1.txt"
         },
         {
             "title": "The Pain Is Real (V2)",
             "artist": "Ricardo Capel",
             "src": "musicas/The pain is real (V2).mp3",
-            "cover": "musicas/capa_pain.jpg",
-            "lyrics": "Versão alternativa...\nCom vocais mais rasgados."
+            "cover": "musicas/album_cover.jpeg",
+            "lyricsFile": "musicas/The pain_v2.txt"
         }
     ];
 
-    // --- ELEMENTOS ---
+    // --- ELEMENTOS E VARIÁVEIS ---
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('play');
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const shuffleBtn = document.getElementById('shuffle');
-    const lyricsBtn = document.getElementById('lyrics-btn'); // Botão Letra
-    
-    // Elementos do Popup
+    const lyricsBtn = document.getElementById('lyrics-btn');
     const lyricsPopup = document.getElementById('lyrics-popup');
     const lyricsText = document.getElementById('lyrics-text');
     const closeLyricsBtn = document.getElementById('close-lyrics');
-
+    
     const titleEl = document.getElementById('title');
     const artistEl = document.getElementById('artist');
     const coverEl = document.getElementById('cover');
@@ -346,22 +244,27 @@
     const durTimeEl = document.getElementById('duration');
     const playlistUl = document.getElementById('playlist-ul');
 
-    const defaultCover = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop";
+    // Capa única padrão
+    const defaultCover = "musicas/album_cover.jpeg";
 
     let songIndex = 0;
     let isShuffle = false;
 
-    // --- FUNÇÕES DE PLAYLIST ---
+    // --- FUNÇÕES ---
+
+    // 1. Renderizar a lista lateral
     function renderPlaylist() {
         playlistUl.innerHTML = "";
         songs.forEach((song, index) => {
             const li = document.createElement('li');
             li.classList.add('playlist-item');
+            
             li.addEventListener('click', () => {
                 songIndex = index;
                 loadSong(songs[songIndex]);
                 playSong();
             });
+
             li.innerHTML = `
                 <div class="item-icon"><i class="fas fa-volume-high"></i></div>
                 <div class="item-info">
@@ -373,9 +276,9 @@
         });
     }
 
+    // 2. Destacar música atual na lista
     function updatePlaylistActiveState() {
-        const items = document.querySelectorAll('.playlist-item');
-        items.forEach((item, index) => {
+        document.querySelectorAll('.playlist-item').forEach((item, index) => {
             if (index === songIndex) {
                 item.classList.add('active-song');
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -385,18 +288,36 @@
         });
     }
 
-    // --- PLAYER CORE ---
-    renderPlaylist();
-    loadSong(songs[songIndex]);
+    // 3. Buscar a letra no arquivo .txt
+    function fetchLyrics(filePath) {
+        lyricsText.innerText = "Carregando letra...";
+        
+        if (!filePath) {
+            lyricsText.innerText = "Letra indisponível.";
+            return;
+        }
 
+        fetch(filePath)
+            .then(response => {
+                if (!response.ok) throw new Error('Arquivo não encontrado');
+                return response.text();
+            })
+            .then(text => {
+                lyricsText.innerText = text;
+            })
+            .catch(error => {
+                console.error("Erro ao carregar letra:", error);
+                lyricsText.innerText = "Letra não encontrada.\nVerifique se o arquivo .txt está na pasta 'musicas'.";
+            });
+    }
+
+    // 4. Carregar Música
     function loadSong(song) {
         titleEl.innerText = song.title;
         artistEl.innerText = song.artist;
         audio.src = encodeURI(song.src);
         
-        // Atualiza a letra no popup
-        lyricsText.innerText = song.lyrics ? song.lyrics : "Letra não disponível.";
-
+        // Carrega capa
         if(song.cover && song.cover.trim() !== "") {
             coverEl.src = song.cover;
         } else {
@@ -404,9 +325,13 @@
         }
         coverEl.onerror = function() { this.src = defaultCover; };
         
+        // Carrega letra
+        fetchLyrics(song.lyricsFile);
+
         updatePlaylistActiveState();
     }
 
+    // 5. Controles de Reprodução
     function playSong() {
         document.querySelector('.player-container').classList.add('playing');
         playBtn.querySelector('i').classList.remove('fa-play');
@@ -426,27 +351,20 @@
         isPlaying ? pauseSong() : playSong();
     });
 
-    // --- LÓGICA DO POPUP DE LETRAS ---
-    lyricsBtn.addEventListener('click', () => {
-        lyricsPopup.classList.add('show');
+    // 6. Controles do Popup de Letra
+    lyricsBtn.addEventListener('click', () => lyricsPopup.classList.add('show'));
+    closeLyricsBtn.addEventListener('click', () => lyricsPopup.classList.remove('show'));
+    lyricsPopup.addEventListener('click', (e) => { 
+        if (e.target === lyricsPopup) lyricsPopup.classList.remove('show'); 
     });
 
-    closeLyricsBtn.addEventListener('click', () => {
-        lyricsPopup.classList.remove('show');
-    });
-
-    // Fecha se clicar fora do texto (no fundo escuro)
-    lyricsPopup.addEventListener('click', (e) => {
-        if (e.target === lyricsPopup) {
-            lyricsPopup.classList.remove('show');
-        }
-    });
-
-    // --- NAVEGAÇÃO ---
+    // 7. Navegação
     function prevSong() {
         if(audio.currentTime > 3) { audio.currentTime = 0; return; }
-        if (isShuffle) { playRandomSong(); } 
-        else {
+        
+        if (isShuffle) { 
+            playRandomSong(); 
+        } else {
             songIndex--;
             if (songIndex < 0) songIndex = songs.length - 1;
             loadSong(songs[songIndex]);
@@ -455,8 +373,9 @@
     }
 
     function nextSong() {
-        if (isShuffle) { playRandomSong(); } 
-        else {
+        if (isShuffle) { 
+            playRandomSong(); 
+        } else {
             songIndex++;
             if (songIndex > songs.length - 1) songIndex = 0;
             loadSong(songs[songIndex]);
@@ -475,14 +394,13 @@
 
     prevBtn.addEventListener('click', prevSong);
     nextBtn.addEventListener('click', nextSong);
-
     shuffleBtn.addEventListener('click', () => {
         isShuffle = !isShuffle;
         shuffleBtn.classList.toggle('active', isShuffle);
     });
 
-    // --- BARRA DE PROGRESSO ---
-    function updateProgress(e) {
+    // 8. Barra de Progresso
+    audio.addEventListener('timeupdate', (e) => {
         const { duration, currentTime } = e.srcElement;
         const progressPercent = (currentTime / duration) * 100;
         progressBar.style.width = `${progressPercent}%`;
@@ -495,17 +413,16 @@
         const currentMin = Math.floor(currentTime / 60);
         const currentSec = Math.floor(currentTime % 60);
         currTimeEl.innerText = `${currentMin}:${currentSec < 10 ? '0' : ''}${currentSec}`;
-    }
+    });
 
-    function setProgress(e) {
+    progressContainer.addEventListener('click', function(e) {
         const width = this.clientWidth;
         const clickX = e.offsetX;
         const duration = audio.duration;
         audio.currentTime = (clickX / width) * duration;
-    }
-
-    audio.addEventListener('timeupdate', updateProgress);
-    progressContainer.addEventListener('click', setProgress);
+    });
+    
+    // Auto-next quando acaba
     audio.addEventListener('ended', nextSong);
 
     if ('mediaSession' in navigator) {
@@ -514,6 +431,11 @@
         navigator.mediaSession.setActionHandler('previoustrack', prevSong);
         navigator.mediaSession.setActionHandler('nexttrack', nextSong);
     }
+
+    // --- INICIALIZAÇÃO ---
+    renderPlaylist();
+    loadSong(songs[songIndex]);
+
 </script>
 </body>
 </html>
