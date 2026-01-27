@@ -9,6 +9,7 @@
         :root {
             --bg-color: #121212;
             --card-color: #181818;
+            --card-glass: rgba(24, 24, 24, 0.95);
             --item-hover: #282828;
             --text-primary: #ffffff;
             --text-secondary: #b3b3b3;
@@ -26,245 +27,212 @@
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 30%, rgba(29,185,84,0.15) 0%, #121212 70%);
         }
 
-        /* Fundo animado */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(29,185,84,0.1) 0%, rgba(18,18,18,0) 70%);
-            z-index: -1;
-            position: fixed; /* Fica fixo ao rolar */
-        }
-
-        /* Container Principal que segura a Lista e o Player */
+        /* --- CONTAINER PRINCIPAL (A "Caixa" que segura tudo) --- */
         .main-wrapper {
             display: flex;
-            gap: 20px;
-            padding: 20px;
-            width: 95%;
+            flex-direction: row; /* Padrão Desktop: Lado a Lado */
+            gap: 0; /* Removemos gap para unir visualmente */
+            width: 90%;
             max-width: 900px;
-            height: 85vh; /* Altura fixa para permitir rolagem interna */
-            align-items: center;
+            height: 550px; /* Altura fixa para harmonia no desktop */
+            background-color: var(--card-glass);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            overflow: hidden; /* Garante que nada saia das bordas arredondadas */
+            backdrop-filter: blur(10px); /* Efeito vidro */
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* --- 1. ESTILO DA LISTA (ESQUERDA) --- */
+        /* --- LADO ESQUERDO: LISTA --- */
         .playlist-sidebar {
-            background-color: var(--card-color);
-            flex: 1; /* Ocupa o espaço restante */
-            height: 100%;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex: 1;
+            background-color: rgba(0,0,0,0.2); /* Um pouco mais escuro que o player */
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Para a barra de rolagem ficar interna */
-            min-width: 250px;
+            overflow: hidden;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
         .playlist-header {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 20px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .playlist-items {
             list-style: none;
             padding: 0;
             margin: 0;
-            overflow-y: auto; /* Rolagem vertical */
+            overflow-y: auto;
             flex-grow: 1;
         }
 
-        /* Scrollbar personalizada */
-        .playlist-items::-webkit-scrollbar {
-            width: 6px;
-        }
-        .playlist-items::-webkit-scrollbar-thumb {
-            background-color: #444;
-            border-radius: 4px;
-        }
+        /* Scrollbar fina e moderna */
+        .playlist-items::-webkit-scrollbar { width: 4px; }
+        .playlist-items::-webkit-scrollbar-thumb { background-color: #444; border-radius: 4px; }
 
         .playlist-item {
             display: flex;
             align-items: center;
-            padding: 12px 10px;
+            padding: 12px;
             border-radius: 6px;
             cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid #222;
+            transition: background 0.2s, transform 0.1s;
+            margin-bottom: 5px;
         }
 
-        .playlist-item:hover {
-            background-color: var(--item-hover);
-        }
+        .playlist-item:hover { background-color: rgba(255,255,255,0.05); }
 
-        /* Música Ativa na lista */
         .playlist-item.active-song {
-            background-color: #222;
-        }
-        .playlist-item.active-song .item-title {
-            color: var(--accent-color);
-        }
-        .playlist-item.active-song .item-icon {
-            opacity: 1; /* Mostra o ícone de 'tocando' */
+            background-color: rgba(29, 185, 84, 0.1); /* Verde bem suave */
+            border-left: 3px solid var(--accent-color);
         }
 
         .item-icon {
             font-size: 0.8rem;
             color: var(--accent-color);
             margin-right: 12px;
-            opacity: 0; /* Invisível por padrão */
+            opacity: 0; 
             width: 15px;
         }
+        .playlist-item.active-song .item-icon { opacity: 1; }
+        .playlist-item.active-song .item-title { color: var(--accent-color); }
 
-        .item-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        .item-info { display: flex; flex-direction: column; overflow: hidden; }
+        .item-title { font-size: 0.9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-artist { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
 
-        .item-title {
-            font-size: 0.95rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-primary);
-        }
-
-        .item-artist {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-
-        /* --- 2. ESTILO DO PLAYER (DIREITA) --- */
+        /* --- LADO DIREITO: PLAYER --- */
         .player-container {
-            background-color: var(--card-color);
-            width: 350px; /* Largura fixa para o player */
+            width: 380px; /* Largura fixa no desktop */
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
-            flex-shrink: 0; /* Não deixa o player encolher */
+            justify-content: center;
+            position: relative;
         }
 
-        /* (CSS do Player mantido igual ao anterior...) */
         .cover-area {
             width: 100%;
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             margin-bottom: 25px;
             position: relative;
-            background-color: #333;
         }
 
-        .cover-area img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .song-info-player {
-            text-align: left;
-            margin-bottom: 20px;
-        }
+        .cover-area img { width: 100%; height: 100%; object-fit: cover; }
 
-        .song-title-main {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .artist-name-main {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-top: 5px;
-        }
+        .song-info-player { text-align: center; margin-bottom: 20px; }
+        .song-title-main { font-size: 1.3rem; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .artist-name-main { color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px; }
 
         .progress-area {
-            height: 6px;
-            width: 100%;
-            background: #4f4f4f;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            padding: 5px 0;
+            height: 5px; width: 100%; background: #4f4f4f; border-radius: 50px; cursor: pointer; margin-bottom: 8px; transition: height 0.2s;
         }
-
-        .progress-bar {
-            height: 6px;
-            width: 0%;
-            background: var(--text-primary);
-            border-radius: 50px;
-            position: relative;
-            transition: width 0.1s linear;
-        }
+        .progress-area:hover { height: 8px; }
+        .progress-bar { height: 100%; width: 0%; background: var(--text-primary); border-radius: 50px; position: relative; }
         .playing .progress-bar { background: var(--accent-color); }
-        .progress-bar::after {
-            content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
-            width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
+        .progress-bar::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+        .progress-area:hover .progress-bar::after { opacity: 1; }
 
-        .timers {
-            display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 20px;
-        }
+        .timers { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 20px; }
 
-        .controls {
-            display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
-        }
-
-        .btn {
-            background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; padding: 10px; transition: color 0.2s; position: relative;
-        }
-        .btn:hover { color: var(--text-primary); }
+        .controls { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+        .btn { background: none; border: none; color: var(--text-secondary); font-size: 1.1rem; cursor: pointer; transition: 0.2s; position: relative; }
+        .btn:hover { color: var(--text-primary); transform: scale(1.1); }
         .btn.active { color: var(--accent-color); }
-        .btn.active::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: var(--accent-color); border-radius: 50%; }
+        .btn.active::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: var(--accent-color); border-radius: 50%; }
 
-        .btn-main {
-            width: 60px; height: 60px; background-color: var(--text-primary); color: #000; border-radius: 50%; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .btn-main { width: 55px; height: 55px; background-color: var(--text-primary); color: #000; border-radius: 50%; font-size: 1.4rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .btn-main:hover { transform: scale(1.05); background-color: var(--accent-hover); color: #000; }
+
+        /* --- POPUP DE LETRAS (NOVIDADE) --- */
+        .lyrics-popup {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Fundo escuro transparente */
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none; /* Não clica quando invisível */
+            transition: opacity 0.3s ease;
+            padding: 30px;
+            box-sizing: border-box;
+            border-radius: 20px;
         }
-        .btn-main:hover { transform: scale(1.05); background-color: var(--accent-hover); }
+
+        .lyrics-popup.show { opacity: 1; pointer-events: auto; }
+
+        .lyrics-content {
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ddd;
+            overflow-y: auto;
+            max-height: 80%;
+            width: 100%;
+            white-space: pre-wrap; /* Respeita as quebras de linha */
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        .close-lyrics {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .close-lyrics:hover { background: rgba(255,255,255,0.2); }
+
 
         /* --- RESPONSIVIDADE (MOBILE) --- */
-        @media (max-width: 800px) {
+        @media (max-width: 850px) {
+            body { align-items: flex-start; padding-top: 20px; } /* Descola do topo */
+            
             .main-wrapper {
-                flex-direction: column-reverse; /* Player em cima, Lista em baixo */
-                height: auto; /* Altura automática para rolar a página */
-                margin-top: 20px;
-                display: block; /* Remove flex para comportamento de bloco natural no mobile */
-                padding: 10px;
+                flex-direction: column; /* Empilha verticalmente */
+                height: auto; /* Altura livre */
+                width: 90%;
+                margin-bottom: 20px;
+                border-radius: 20px; /* Mantém arredondado */
             }
 
             .player-container {
-                width: 100%; /* Player ocupa largura total */
-                max-width: 400px;
-                margin: 0 auto 30px auto; /* Centraliza */
-                position: sticky; /* Opcional: faz o player grudar no topo */
-                top: 10px;
-                z-index: 100;
+                width: 100%; /* Ocupa tudo */
+                order: 1; /* Player aparece PRIMEIRO */
+                padding: 25px;
+                box-sizing: border-box;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
             }
 
             .playlist-sidebar {
                 width: 100%;
-                max-width: 400px;
-                margin: 0 auto;
-                height: 400px; /* Altura fixa da lista no mobile */
+                order: 2; /* Lista aparece EM BAIXO */
+                height: 300px; /* Altura fixa para a lista no mobile */
+                border-right: none;
+                box-sizing: border-box;
             }
         }
     </style>
@@ -275,13 +243,21 @@
     
     <div class="playlist-sidebar">
         <div class="playlist-header">
-            <i class="fas fa-list"></i> Minhas Músicas
+            <i class="fas fa-list-ul" style="margin-right: 10px;"></i> Playlist
         </div>
         <ul class="playlist-items" id="playlist-ul">
             </ul>
     </div>
 
     <div class="player-container" id="player">
+        
+        <div class="lyrics-popup" id="lyrics-popup">
+            <div class="lyrics-content" id="lyrics-text">
+                Carregando letra...
+            </div>
+            <button class="close-lyrics" id="close-lyrics">Fechar</button>
+        </div>
+
         <div class="cover-area">
             <img src="" alt="Capa" id="cover">
         </div>
@@ -300,11 +276,13 @@
         </div>
 
         <div class="controls">
-            <button class="btn" id="shuffle"><i class="fas fa-shuffle"></i></button>
+            <button class="btn" id="lyrics-btn" title="Ver Letra"><i class="fas fa-microphone-lines"></i></button>
+            
             <button class="btn" id="prev"><i class="fas fa-step-backward"></i></button>
             <button class="btn btn-main" id="play"><i class="fas fa-play"></i></button>
             <button class="btn" id="next"><i class="fas fa-step-forward"></i></button>
-            <button class="btn" id="repeat"><i class="fas fa-repeat"></i></button>
+            
+            <button class="btn" id="shuffle" title="Aleatório"><i class="fas fa-shuffle"></i></button>
         </div>
     </div>
 
@@ -313,31 +291,36 @@
 <audio id="audio"></audio>
 
 <script>
-    // --- LISTA DE MÚSICAS ---
+    // --- DADOS DAS MÚSICAS COM LETRAS ---
+    // Adicione a letra dentro do campo "lyrics" usando \n para pular linha
     const songs = [
         {
             "title": "I Walk The Shadows... Of A Sunless Day (V1)",
             "artist": "Ricardo Capel",
             "src": "musicas/I walk the shadows... of a sunless day (V1).mp3",
-            "cover": "musicas/capa_shadows.jpg" 
+            "cover": "musicas/capa_shadows.jpg",
+            "lyrics": "Essa é a letra da música Shadows V1.\n\nEscuridão profunda...\nCaminhando sozinho...\n(Cole aqui a letra completa se quiser)"
         },
         {
             "title": "I Walk The Shadows... Of A Sunless Day (V2)",
             "artist": "Ricardo Capel",
             "src": "musicas/I walk the shadows... of a sunless day (V2).mp3",
-            "cover": "musicas/capa_shadows.jpg"
+            "cover": "musicas/capa_shadows.jpg",
+            "lyrics": "Versão 2 da música...\nMais rápida e intensa!\n\nHeavy metal na veia..."
         },
         {
             "title": "The Pain Is Real (V1)",
             "artist": "Ricardo Capel",
             "src": "musicas/The pain is real (V1).mp3",
-            "cover": "musicas/capa_pain.jpg"
+            "cover": "musicas/capa_pain.jpg",
+            "lyrics": "The pain is real...\nSinto a dor...\n\nSolo de guitarra!!!"
         },
         {
             "title": "The Pain Is Real (V2)",
             "artist": "Ricardo Capel",
             "src": "musicas/The pain is real (V2).mp3",
-            "cover": "musicas/capa_pain.jpg"
+            "cover": "musicas/capa_pain.jpg",
+            "lyrics": "Versão alternativa...\nCom vocais mais rasgados."
         }
     ];
 
@@ -347,8 +330,13 @@
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const shuffleBtn = document.getElementById('shuffle');
-    const repeatBtn = document.getElementById('repeat');
+    const lyricsBtn = document.getElementById('lyrics-btn'); // Botão Letra
     
+    // Elementos do Popup
+    const lyricsPopup = document.getElementById('lyrics-popup');
+    const lyricsText = document.getElementById('lyrics-text');
+    const closeLyricsBtn = document.getElementById('close-lyrics');
+
     const titleEl = document.getElementById('title');
     const artistEl = document.getElementById('artist');
     const coverEl = document.getElementById('cover');
@@ -356,32 +344,24 @@
     const progressBar = document.getElementById('progress-bar');
     const currTimeEl = document.getElementById('current-time');
     const durTimeEl = document.getElementById('duration');
-    const playerContainer = document.getElementById('player');
-    const playlistUl = document.getElementById('playlist-ul'); // A lista
+    const playlistUl = document.getElementById('playlist-ul');
 
     const defaultCover = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop";
 
     let songIndex = 0;
     let isShuffle = false;
-    let isRepeat = false;
 
-    // --- 1. FUNÇÃO PARA GERAR A PLAYLIST VISUAL ---
+    // --- FUNÇÕES DE PLAYLIST ---
     function renderPlaylist() {
-        playlistUl.innerHTML = ""; // Limpa a lista antes de gerar
-        
+        playlistUl.innerHTML = "";
         songs.forEach((song, index) => {
-            // Cria o elemento LI
             const li = document.createElement('li');
             li.classList.add('playlist-item');
-            
-            // Adiciona evento de clique: Toca a música clicada
             li.addEventListener('click', () => {
                 songIndex = index;
                 loadSong(songs[songIndex]);
                 playSong();
             });
-
-            // HTML interno do item
             li.innerHTML = `
                 <div class="item-icon"><i class="fas fa-volume-high"></i></div>
                 <div class="item-info">
@@ -389,19 +369,15 @@
                     <span class="item-artist">${song.artist}</span>
                 </div>
             `;
-            
             playlistUl.appendChild(li);
         });
     }
 
-    // --- 2. ATUALIZAR DESTAQUE NA LISTA ---
     function updatePlaylistActiveState() {
         const items = document.querySelectorAll('.playlist-item');
-        
         items.forEach((item, index) => {
             if (index === songIndex) {
                 item.classList.add('active-song');
-                // Auto scroll para a música ativa se a lista for longa
                 item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else {
                 item.classList.remove('active-song');
@@ -409,53 +385,68 @@
         });
     }
 
-    // --- FUNÇÕES DO PLAYER ---
-    
-    // Inicializar
-    renderPlaylist(); // Gera a lista
-    loadSong(songs[songIndex]); // Carrega a 1ª música
+    // --- PLAYER CORE ---
+    renderPlaylist();
+    loadSong(songs[songIndex]);
 
     function loadSong(song) {
         titleEl.innerText = song.title;
         artistEl.innerText = song.artist;
         audio.src = encodeURI(song.src);
         
+        // Atualiza a letra no popup
+        lyricsText.innerText = song.lyrics ? song.lyrics : "Letra não disponível.";
+
         if(song.cover && song.cover.trim() !== "") {
             coverEl.src = song.cover;
         } else {
             coverEl.src = defaultCover;
         }
         coverEl.onerror = function() { this.src = defaultCover; };
-
-        // Atualiza quem está verde na lista
+        
         updatePlaylistActiveState();
     }
 
     function playSong() {
-        playerContainer.classList.add('playing');
+        document.querySelector('.player-container').classList.add('playing');
         playBtn.querySelector('i').classList.remove('fa-play');
         playBtn.querySelector('i').classList.add('fa-pause');
         audio.play();
     }
 
     function pauseSong() {
-        playerContainer.classList.remove('playing');
+        document.querySelector('.player-container').classList.remove('playing');
         playBtn.querySelector('i').classList.add('fa-play');
         playBtn.querySelector('i').classList.remove('fa-pause');
         audio.pause();
     }
 
     playBtn.addEventListener('click', () => {
-        const isPlaying = playerContainer.classList.contains('playing');
+        const isPlaying = document.querySelector('.player-container').classList.contains('playing');
         isPlaying ? pauseSong() : playSong();
     });
 
+    // --- LÓGICA DO POPUP DE LETRAS ---
+    lyricsBtn.addEventListener('click', () => {
+        lyricsPopup.classList.add('show');
+    });
+
+    closeLyricsBtn.addEventListener('click', () => {
+        lyricsPopup.classList.remove('show');
+    });
+
+    // Fecha se clicar fora do texto (no fundo escuro)
+    lyricsPopup.addEventListener('click', (e) => {
+        if (e.target === lyricsPopup) {
+            lyricsPopup.classList.remove('show');
+        }
+    });
+
+    // --- NAVEGAÇÃO ---
     function prevSong() {
         if(audio.currentTime > 3) { audio.currentTime = 0; return; }
-        
-        if (isShuffle) {
-            playRandomSong();
-        } else {
+        if (isShuffle) { playRandomSong(); } 
+        else {
             songIndex--;
             if (songIndex < 0) songIndex = songs.length - 1;
             loadSong(songs[songIndex]);
@@ -464,9 +455,8 @@
     }
 
     function nextSong() {
-        if (isShuffle) {
-            playRandomSong();
-        } else {
+        if (isShuffle) { playRandomSong(); } 
+        else {
             songIndex++;
             if (songIndex > songs.length - 1) songIndex = 0;
             loadSong(songs[songIndex]);
@@ -491,11 +481,7 @@
         shuffleBtn.classList.toggle('active', isShuffle);
     });
 
-    repeatBtn.addEventListener('click', () => {
-        isRepeat = !isRepeat;
-        repeatBtn.classList.toggle('active', isRepeat);
-    });
-
+    // --- BARRA DE PROGRESSO ---
     function updateProgress(e) {
         const { duration, currentTime } = e.srcElement;
         const progressPercent = (currentTime / duration) * 100;
@@ -520,15 +506,7 @@
 
     audio.addEventListener('timeupdate', updateProgress);
     progressContainer.addEventListener('click', setProgress);
-    
-    audio.addEventListener('ended', () => {
-        if (isRepeat) {
-            audio.currentTime = 0;
-            playSong();
-        } else {
-            nextSong();
-        }
-    });
+    audio.addEventListener('ended', nextSong);
 
     if ('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', playSong);
