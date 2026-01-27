@@ -2,16 +2,17 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ricardo Capel | Merigus Player</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #121212;
             --card-color: #181818;
+            --item-hover: #282828;
             --text-primary: #ffffff;
             --text-secondary: #b3b3b3;
-            --accent-color: #1db954; /* Verde Spotify */
+            --accent-color: #1db954;
             --accent-hover: #1ed760;
         }
 
@@ -19,40 +20,146 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
             font-family: 'Circular Std', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Evita barras de rolagem */
+            overflow-x: hidden;
         }
 
-        /* Fundo animado sutil */
+        /* Fundo animado */
         body::before {
             content: '';
             position: absolute;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, rgba(29,185,84,0.1) 0%, rgba(18,18,18,0) 60%);
-            animation: pulse 15s infinite alternate;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(29,185,84,0.1) 0%, rgba(18,18,18,0) 70%);
             z-index: -1;
+            position: fixed; /* Fica fixo ao rolar */
         }
 
-        @keyframes pulse {
-            0% { transform: translate(-5%, -5%) scale(1); }
-            100% { transform: translate(5%, 5%) scale(1.1); }
+        /* Container Principal que segura a Lista e o Player */
+        .main-wrapper {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            width: 95%;
+            max-width: 900px;
+            height: 85vh; /* Altura fixa para permitir rolagem interna */
+            align-items: center;
         }
 
+        /* --- 1. ESTILO DA LISTA (ESQUERDA) --- */
+        .playlist-sidebar {
+            background-color: var(--card-color);
+            flex: 1; /* Ocupa o espaço restante */
+            height: 100%;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Para a barra de rolagem ficar interna */
+            min-width: 250px;
+        }
+
+        .playlist-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .playlist-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto; /* Rolagem vertical */
+            flex-grow: 1;
+        }
+
+        /* Scrollbar personalizada */
+        .playlist-items::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist-items::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 4px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #222;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--item-hover);
+        }
+
+        /* Música Ativa na lista */
+        .playlist-item.active-song {
+            background-color: #222;
+        }
+        .playlist-item.active-song .item-title {
+            color: var(--accent-color);
+        }
+        .playlist-item.active-song .item-icon {
+            opacity: 1; /* Mostra o ícone de 'tocando' */
+        }
+
+        .item-icon {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-right: 12px;
+            opacity: 0; /* Invisível por padrão */
+            width: 15px;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .item-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+
+        .item-artist {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+
+        /* --- 2. ESTILO DO PLAYER (DIREITA) --- */
         .player-container {
             background-color: var(--card-color);
-            width: 360px;
+            width: 350px; /* Largura fixa para o player */
             padding: 30px;
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0; /* Não deixa o player encolher */
         }
 
-        /* Área da Capa */
+        /* (CSS do Player mantido igual ao anterior...) */
         .cover-area {
             width: 100%;
             aspect-ratio: 1;
@@ -68,21 +175,15 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .playing .cover-area img {
-            transform: scale(1.05);
-        }
-
-        /* Informações da Música */
-        .song-info {
+        
+        .song-info-player {
             text-align: left;
             margin-bottom: 20px;
         }
 
-        .song-title {
-            font-size: 1.3rem;
+        .song-title-main {
+            font-size: 1.4rem;
             font-weight: 700;
             margin: 0;
             white-space: nowrap;
@@ -90,176 +191,129 @@
             text-overflow: ellipsis;
         }
 
-        .artist-name {
+        .artist-name-main {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 1rem;
             margin-top: 5px;
         }
 
-        /* Barra de Progresso */
         .progress-area {
-            height: 5px;
+            height: 6px;
             width: 100%;
             background: #4f4f4f;
             border-radius: 50px;
             cursor: pointer;
-            margin-bottom: 8px;
-            transition: height 0.2s;
-        }
-
-        .progress-area:hover {
-            height: 8px; /* Fica mais grossa ao passar o mouse */
+            margin-bottom: 10px;
+            padding: 5px 0;
         }
 
         .progress-bar {
-            height: 100%;
+            height: 6px;
             width: 0%;
             background: var(--text-primary);
             border-radius: 50px;
             position: relative;
             transition: width 0.1s linear;
         }
-
-        .playing .progress-bar {
-            background: var(--accent-color);
-        }
-
-        /* Bolinha do scrubber */
+        .playing .progress-bar { background: var(--accent-color); }
         .progress-bar::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .progress-area:hover .progress-bar::after {
-            opacity: 1;
+            content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+            width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .timers {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
+            display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 20px;
         }
 
-        /* Controles */
         .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
         }
 
         .btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary); /* Cor padrão cinza */
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.1s;
-            position: relative;
+            background: none; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer; padding: 10px; transition: color 0.2s; position: relative;
         }
+        .btn:hover { color: var(--text-primary); }
+        .btn.active { color: var(--accent-color); }
+        .btn.active::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: var(--accent-color); border-radius: 50%; }
 
-        .btn:hover {
-            color: var(--text-primary);
-        }
-
-        .btn:active {
-            transform: scale(0.9);
-        }
-
-        /* Estado Ativo (para Shuffle e Repeat) */
-        .btn.active {
-            color: var(--accent-color); /* Fica verde quando ativo */
-        }
-        
-        /* Ponto indicador embaixo do botão ativo (estilo Spotify) */
-        .btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-        }
-
-        /* Botão Play/Pause maior */
         .btn-main {
-            width: 55px;
-            height: 55px;
-            background-color: var(--text-primary);
-            color: #000; /* Ícone preto */
-            border-radius: 50%;
-            font-size: 1.4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.2s, background-color 0.2s;
+            width: 60px; height: 60px; background-color: var(--text-primary); color: #000; border-radius: 50%; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .btn-main:hover { transform: scale(1.05); background-color: var(--accent-hover); }
 
-        .btn-main:hover {
-            transform: scale(1.05);
-            background-color: var(--accent-hover);
-            color: #000; /* Garante que o ícone fique preto no hover */
-        }
-        
-        .btn-main:active {
-             transform: scale(0.95);
-        }
+        /* --- RESPONSIVIDADE (MOBILE) --- */
+        @media (max-width: 800px) {
+            .main-wrapper {
+                flex-direction: column-reverse; /* Player em cima, Lista em baixo */
+                height: auto; /* Altura automática para rolar a página */
+                margin-top: 20px;
+                display: block; /* Remove flex para comportamento de bloco natural no mobile */
+                padding: 10px;
+            }
 
+            .player-container {
+                width: 100%; /* Player ocupa largura total */
+                max-width: 400px;
+                margin: 0 auto 30px auto; /* Centraliza */
+                position: sticky; /* Opcional: faz o player grudar no topo */
+                top: 10px;
+                z-index: 100;
+            }
+
+            .playlist-sidebar {
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+                height: 400px; /* Altura fixa da lista no mobile */
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="player-container" id="player">
-    <div class="cover-area">
-        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop" alt="Capa do Álbum" id="cover">
+<div class="main-wrapper">
+    
+    <div class="playlist-sidebar">
+        <div class="playlist-header">
+            <i class="fas fa-list"></i> Minhas Músicas
+        </div>
+        <ul class="playlist-items" id="playlist-ul">
+            </ul>
     </div>
 
-    <div class="song-info">
-        <h2 class="song-title" id="title">Carregando...</h2>
-        <p class="artist-name" id="artist">Ricardo Capel</p>
+    <div class="player-container" id="player">
+        <div class="cover-area">
+            <img src="" alt="Capa" id="cover">
+        </div>
+
+        <div class="song-info-player">
+            <h2 class="song-title-main" id="title">Carregando...</h2>
+            <p class="artist-name-main" id="artist">Ricardo Capel</p>
+        </div>
+
+        <div class="progress-area" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="timers">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="shuffle"><i class="fas fa-shuffle"></i></button>
+            <button class="btn" id="prev"><i class="fas fa-step-backward"></i></button>
+            <button class="btn btn-main" id="play"><i class="fas fa-play"></i></button>
+            <button class="btn" id="next"><i class="fas fa-step-forward"></i></button>
+            <button class="btn" id="repeat"><i class="fas fa-repeat"></i></button>
+        </div>
     </div>
 
-    <div class="progress-area" id="progress-container">
-        <div class="progress-bar" id="progress-bar"></div>
-    </div>
-    <div class="timers">
-        <span id="current-time">0:00</span>
-        <span id="duration">0:00</span>
-    </div>
-
-    <div class="controls">
-        <button class="btn" id="shuffle" title="Aleatório"><i class="fas fa-shuffle"></i></button>
-        
-        <button class="btn" id="prev" title="Anterior"><i class="fas fa-step-backward"></i></button>
-        
-        <button class="btn btn-main" id="play" title="Tocar/Pausar"><i class="fas fa-play"></i></button>
-        
-        <button class="btn" id="next" title="Próxima"><i class="fas fa-step-forward"></i></button>
-        
-        <button class="btn" id="repeat" title="Repetir"><i class="fas fa-repeat"></i></button>
-    </div>
 </div>
 
 <audio id="audio"></audio>
 
 <script>
     // --- LISTA DE MÚSICAS ---
-    // ATENÇÃO: Verifique se os nomes dos arquivos e caminhos estão corretos
     const songs = [
         {
             "title": "I Walk The Shadows... Of A Sunless Day (V1)",
@@ -287,7 +341,7 @@
         }
     ];
 
-    // --- ELEMENTOS DO DOM ---
+    // --- ELEMENTOS ---
     const audio = document.getElementById('audio');
     const playBtn = document.getElementById('play');
     const prevBtn = document.getElementById('prev');
@@ -298,38 +352,83 @@
     const titleEl = document.getElementById('title');
     const artistEl = document.getElementById('artist');
     const coverEl = document.getElementById('cover');
-    
     const progressContainer = document.getElementById('progress-container');
     const progressBar = document.getElementById('progress-bar');
     const currTimeEl = document.getElementById('current-time');
     const durTimeEl = document.getElementById('duration');
     const playerContainer = document.getElementById('player');
+    const playlistUl = document.getElementById('playlist-ul'); // A lista
 
-    // Imagem padrão (Dark/Metal)
     const defaultCover = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop";
 
-    // --- VARIÁVEIS DE ESTADO ---
     let songIndex = 0;
     let isShuffle = false;
-    let isRepeat = false; // Se true, repete a mesma música
+    let isRepeat = false;
 
+    // --- 1. FUNÇÃO PARA GERAR A PLAYLIST VISUAL ---
+    function renderPlaylist() {
+        playlistUl.innerHTML = ""; // Limpa a lista antes de gerar
+        
+        songs.forEach((song, index) => {
+            // Cria o elemento LI
+            const li = document.createElement('li');
+            li.classList.add('playlist-item');
+            
+            // Adiciona evento de clique: Toca a música clicada
+            li.addEventListener('click', () => {
+                songIndex = index;
+                loadSong(songs[songIndex]);
+                playSong();
+            });
+
+            // HTML interno do item
+            li.innerHTML = `
+                <div class="item-icon"><i class="fas fa-volume-high"></i></div>
+                <div class="item-info">
+                    <span class="item-title">${song.title}</span>
+                    <span class="item-artist">${song.artist}</span>
+                </div>
+            `;
+            
+            playlistUl.appendChild(li);
+        });
+    }
+
+    // --- 2. ATUALIZAR DESTAQUE NA LISTA ---
+    function updatePlaylistActiveState() {
+        const items = document.querySelectorAll('.playlist-item');
+        
+        items.forEach((item, index) => {
+            if (index === songIndex) {
+                item.classList.add('active-song');
+                // Auto scroll para a música ativa se a lista for longa
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                item.classList.remove('active-song');
+            }
+        });
+    }
+
+    // --- FUNÇÕES DO PLAYER ---
+    
     // Inicializar
-    loadSong(songs[songIndex]);
+    renderPlaylist(); // Gera a lista
+    loadSong(songs[songIndex]); // Carrega a 1ª música
 
     function loadSong(song) {
         titleEl.innerText = song.title;
         artistEl.innerText = song.artist;
+        audio.src = encodeURI(song.src);
         
-        // Tratamento para caracteres especiais na URL
-        const encodedSrc = encodeURI(song.src);
-        audio.src = encodedSrc;
-        
-        // Carregar capa ou usar padrão
         if(song.cover && song.cover.trim() !== "") {
             coverEl.src = song.cover;
         } else {
             coverEl.src = defaultCover;
         }
+        coverEl.onerror = function() { this.src = defaultCover; };
+
+        // Atualiza quem está verde na lista
+        updatePlaylistActiveState();
     }
 
     function playSong() {
@@ -346,20 +445,13 @@
         audio.pause();
     }
 
-    // Toggle Play/Pause
     playBtn.addEventListener('click', () => {
         const isPlaying = playerContainer.classList.contains('playing');
         isPlaying ? pauseSong() : playSong();
     });
 
-    // --- LÓGICA DE NAVEGAÇÃO ---
-
     function prevSong() {
-        // Se estiver nos primeiros 3 segundos, reinicia a música (igual Spotify)
-        if(audio.currentTime > 3) {
-            audio.currentTime = 0;
-            return;
-        }
+        if(audio.currentTime > 3) { audio.currentTime = 0; return; }
         
         if (isShuffle) {
             playRandomSong();
@@ -382,14 +474,10 @@
         }
     }
 
-    // Função auxiliar para Aleatório
     function playRandomSong() {
         let newIndex;
-        // Garante que a próxima música não seja a mesma atual (se houver mais de 1 música)
-        do {
-            newIndex = Math.floor(Math.random() * songs.length);
-        } while (newIndex === songIndex && songs.length > 1);
-        
+        do { newIndex = Math.floor(Math.random() * songs.length); } 
+        while (newIndex === songIndex && songs.length > 1);
         songIndex = newIndex;
         loadSong(songs[songIndex]);
         playSong();
@@ -398,11 +486,8 @@
     prevBtn.addEventListener('click', prevSong);
     nextBtn.addEventListener('click', nextSong);
 
-    // --- CONTROLES EXTRAS (SHUFFLE E REPEAT) ---
-
     shuffleBtn.addEventListener('click', () => {
         isShuffle = !isShuffle;
-        // Adiciona ou remove a classe 'active' (cor verde)
         shuffleBtn.classList.toggle('active', isShuffle);
     });
 
@@ -410,8 +495,6 @@
         isRepeat = !isRepeat;
         repeatBtn.classList.toggle('active', isRepeat);
     });
-
-    // --- PROGRESSO E TEMPO ---
 
     function updateProgress(e) {
         const { duration, currentTime } = e.srcElement;
@@ -423,7 +506,6 @@
             const durationSec = Math.floor(duration % 60);
             durTimeEl.innerText = `${durationMin}:${durationSec < 10 ? '0' : ''}${durationSec}`;
         }
-        
         const currentMin = Math.floor(currentTime / 60);
         const currentSec = Math.floor(currentTime % 60);
         currTimeEl.innerText = `${currentMin}:${currentSec < 10 ? '0' : ''}${currentSec}`;
@@ -439,18 +521,21 @@
     audio.addEventListener('timeupdate', updateProgress);
     progressContainer.addEventListener('click', setProgress);
     
-    // --- O QUE FAZER QUANDO A MÚSICA ACABA ---
     audio.addEventListener('ended', () => {
         if (isRepeat) {
-            // Se repetir estiver ligado, toca a mesma de novo
             audio.currentTime = 0;
             playSong();
         } else {
-            // Se não, vai para a próxima (obedecendo o shuffle se estiver ligado)
             nextSong();
         }
     });
 
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', playSong);
+        navigator.mediaSession.setActionHandler('pause', pauseSong);
+        navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+        navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+    }
 </script>
 </body>
 </html>
