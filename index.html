@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ricardo Capel | Merigus Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-color: #181818;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #1db954;
+            --accent-hover: #1ed760;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Circular Std', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Efeito de fundo animado sutil */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(29,185,84,0.1) 0%, rgba(18,18,18,0) 60%);
+            animation: pulse 10s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-10%, -10%) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.1); }
+        }
+
+        .player-container {
+            background-color: var(--card-color);
+            width: 350px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .cover-area {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+            position: relative;
+            background-color: #333; /* Fundo caso a imagem demore */
+        }
+
+        .cover-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Animação quando está tocando */
+        .playing .cover-area img {
+            transform: scale(1.05);
+        }
+
+        .song-info {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .song-title {
+            font-size: 1.3rem; /* Ajustado levemente para títulos longos */
+            font-weight: 700;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .artist-name {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Barra de Progresso */
+        .progress-area {
+            height: 6px;
+            width: 100%;
+            background: #4f4f4f;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--text-primary); /* Branco ao pausar */
+            border-radius: 50px;
+            position: relative;
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        .playing .progress-bar {
+            background: var(--accent-color); /* Verde ao tocar */
+        }
+
+        /* Bolinha do scrubber (aparece no hover) */
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .progress-area:hover .progress-bar::after {
+            opacity: 1;
+        }
+
+        .timers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Controles */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            color: var(--text-primary);
+        }
+
+        .btn:active {
+            transform: scale(0.9);
+        }
+
+        .btn-main {
+            width: 60px;
+            height: 60px;
+            background-color: var(--text-primary);
+            color: #000;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            background-color: var(--accent-hover);
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-container" id="player">
+    <div class="cover-area">
+        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop" alt="Capa do Álbum" id="cover">
+    </div>
+
+    <div class="song-info">
+        <h2 class="song-title" id="title">Carregando...</h2>
+        <p class="artist-name" id="artist">Ricardo Capel</p>
+    </div>
+
+    <div class="progress-area" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="timers">
+        <span id="current-time">0:00</span>
+        <span id="duration">0:00</span>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prev"><i class="fas fa-step-backward"></i></button>
+        <button class="btn btn-main" id="play"><i class="fas fa-play"></i></button>
+        <button class="btn" id="next"><i class="fas fa-step-forward"></i></button>
+    </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+    // --- LISTA DE MÚSICAS GERADA PELO PYTHON ---
+    const songs = [
+        {
+            "title": "I Walk The Shadows... Of A Sunless Day (V1)",
+            "artist": "Ricardo Capel",
+            "src": "musicas/I walk the shadows... of a sunless day (V1).mp3",
+            "cover": ""
+        },
+        {
+            "title": "I Walk The Shadows... Of A Sunless Day (V2)",
+            "artist": "Ricardo Capel",
+            "src": "musicas/I walk the shadows... of a sunless day (V2).mp3",
+            "cover": ""
+        },
+        {
+            "title": "The Pain Is Real (V1)",
+            "artist": "Ricardo Capel",
+            "src": "musicas/The pain is real (V1).mp3",
+            "cover": ""
+        },
+        {
+            "title": "The Pain Is Real (V2)",
+            "artist": "Ricardo Capel",
+            "src": "musicas/The pain is real (V2).mp3",
+            "cover": ""
+        }
+    ];
+
+    // --- LÓGICA DO PLAYER ---
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const titleEl = document.getElementById('title');
+    const artistEl = document.getElementById('artist');
+    const coverEl = document.getElementById('cover');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const currTimeEl = document.getElementById('current-time');
+    const durTimeEl = document.getElementById('duration');
+    const playerContainer = document.getElementById('player');
+
+    // Imagem padrão caso a música não tenha capa definida
+    const defaultCover = "https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop";
+
+    let songIndex = 0;
+
+    // Inicializar na primeira música
+    loadSong(songs[songIndex]);
+
+    function loadSong(song) {
+        titleEl.innerText = song.title;
+        artistEl.innerText = song.artist;
+        
+        // Ajuste importante: codificar a URL para lidar com espaços e caracteres especiais no nome do arquivo
+        const encodedSrc = encodeURI(song.src);
+        audio.src = encodedSrc;
+        
+        // Lógica da capa
+        if(song.cover && song.cover.trim() !== "") {
+            coverEl.src = song.cover;
+        } else {
+            coverEl.src = defaultCover;
+        }
+    }
+
+    function playSong() {
+        playerContainer.classList.add('playing');
+        playBtn.querySelector('i').classList.remove('fa-play');
+        playBtn.querySelector('i').classList.add('fa-pause');
+        audio.play();
+    }
+
+    function pauseSong() {
+        playerContainer.classList.remove('playing');
+        playBtn.querySelector('i').classList.add('fa-play');
+        playBtn.querySelector('i').classList.remove('fa-pause');
+        audio.pause();
+    }
+
+    playBtn.addEventListener('click', () => {
+        const isPlaying = playerContainer.classList.contains('playing');
+        isPlaying ? pauseSong() : playSong();
+    });
+
+    function prevSong() {
+        songIndex--;
+        if (songIndex < 0) songIndex = songs.length - 1;
+        loadSong(songs[songIndex]);
+        playSong();
+    }
+
+    function nextSong() {
+        songIndex++;
+        if (songIndex > songs.length - 1) songIndex = 0;
+        loadSong(songs[songIndex]);
+        playSong();
+    }
+
+    prevBtn.addEventListener('click', prevSong);
+    nextBtn.addEventListener('click', nextSong);
+
+    function updateProgress(e) {
+        const { duration, currentTime } = e.srcElement;
+        const progressPercent = (currentTime / duration) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        
+        if(duration) {
+            const durationMin = Math.floor(duration / 60);
+            const durationSec = Math.floor(duration % 60);
+            durTimeEl.innerText = `${durationMin}:${durationSec < 10 ? '0' : ''}${durationSec}`;
+        }
+        
+        const currentMin = Math.floor(currentTime / 60);
+        const currentSec = Math.floor(currentTime % 60);
+        currTimeEl.innerText = `${currentMin}:${currentSec < 10 ? '0' : ''}${currentSec}`;
+    }
+
+    function setProgress(e) {
+        const width = this.clientWidth;
+        const clickX = e.offsetX;
+        const duration = audio.duration;
+        audio.currentTime = (clickX / width) * duration;
+    }
+
+    audio.addEventListener('timeupdate', updateProgress);
+    progressContainer.addEventListener('click', setProgress);
+    
+    // Auto-play next song
+    audio.addEventListener('ended', nextSong);
+
+</script>
+</body>
+</html>
