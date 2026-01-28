@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MERIGUS</title>
+    <title>MeriguS - DOOM EP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* --- ESTILOS VISUAIS (Glassmorphism & Responsivo) --- */
@@ -14,7 +14,7 @@
             --item-hover: #282828;
             --text-primary: #ffffff;
             --text-secondary: #b3b3b3;
-            --accent-color: #1db954;
+            --accent-color: #1db954; /* Verde Spotify ou mude para Cinza Chumbo se preferir mais Doom */
             --accent-hover: #1ed760;
         }
 
@@ -28,7 +28,7 @@
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 30%, rgba(29,185,84,0.15) 0%, #121212 70%);
+            background-image: radial-gradient(circle at 50% 30%, rgba(50, 50, 50, 0.2) 0%, #121212 70%);
         }
 
         /* Container Principal */
@@ -81,7 +81,7 @@
             display: flex; align-items: center; padding: 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; margin-bottom: 5px;
         }
         .playlist-item:hover { background-color: rgba(255,255,255,0.05); }
-        .playlist-item.active-song { background-color: rgba(29, 185, 84, 0.1); border-left: 3px solid var(--accent-color); }
+        .playlist-item.active-song { background-color: rgba(255, 255, 255, 0.1); border-left: 3px solid var(--accent-color); }
         .item-icon { font-size: 0.8rem; color: var(--accent-color); margin-right: 12px; opacity: 0; width: 15px; }
         .playlist-item.active-song .item-icon { opacity: 1; }
         .playlist-item.active-song .item-title { color: var(--accent-color); }
@@ -167,7 +167,7 @@
 
         <div class="song-info-player">
             <h2 class="song-title-main" id="title">Carregando...</h2>
-            <p class="artist-name-main" id="artist">Merigus</p>
+            <p class="artist-name-main" id="artist">Ricardo Capel</p>
         </div>
 
         <div class="progress-area" id="progress-container">
@@ -191,51 +191,42 @@
 <audio id="audio"></audio>
 
 <script>
-    // --- LISTA DE MÚSICAS ---
-    // Todas agora usam "musicas/album_cover.jpeg"
+    // --- LISTA DE MÚSICAS ATUALIZADA ---
     const songs = [
         {
-            "title": "I Walk The Shadows... Of A Sunless Day (V1)",
-            "artist": "Merigus",
-            "src": "musicas/I walk the shadows... of a sunless day (V1).mp3",
-            "cover": "musicas/album_cover.jpeg", 
-            "lyricsFile": "musicas/I walk_v1.txt"
+            "title": "Beneath The Frost",
+            "artist": "MeriguS",
+            "src": "musicas/Beneath the Frost.mp3",
+            "cover": "", // Usará o default
+            "lyricsFile": "musicas/Beneath the Frost.txt"
         },
         {
-            "title": "I Walk The Shadows... Of A Sunless Day (V2)",
-            "artist": "Merigus",
-            "src": "musicas/I walk the shadows... of a sunless day (V2).mp3",
-            "cover": "musicas/album_cover.jpeg",
-            "lyricsFile": "musicas/I walk_v2.txt"
+            "title": "Fade To Rust",
+            "artist": "MeriguS",
+            "src": "musicas/Fade to Rust.mp3",
+            "cover": "",
+            "lyricsFile": "musicas/Fade to Rust.txt"
         },
         {
-            "title": "The Pain Is Real (V1)",
-            "artist": "Merigus",
-            "src": "musicas/The pain is real (V1).mp3",
-            "cover": "musicas/album_cover.jpeg",
-            "lyricsFile": "musicas/The pain_v1.txt"
+            "title": "The Last Goodbye",
+            "artist": "MeriguS",
+            "src": "musicas/The Last Goodbye.mp3",
+            "cover": "",
+            "lyricsFile": "musicas/The Last Goodbye.txt"
         },
         {
-            "title": "The Pain Is Real (V2)",
-            "artist": "Merigus",
-            "src": "musicas/The pain is real (V2).mp3",
-            "cover": "musicas/album_cover.jpeg",
-            "lyricsFile": "musicas/The pain_v2.txt"
+            "title": "The Unpaid Debt",
+            "artist": "MeriguS",
+            "src": "musicas/The Unpaid Debt.mp3",
+            "cover": "",
+            "lyricsFile": "musicas/The Unpaid Debt.txt"
         },
         {
-            "title": "Fade to Rust",
-            "artist": "Merigus",
-            "src": "musicas/Fade to rust.mp3",
-            "cover": "musicas/album_cover.jpeg",
-            "lyricsFile": "musicas/Fade to rust.txt"
-        },
-        // NOVA MÚSICA ADICIONADA:
-        {
-            "title": "Take Me Away",
-            "artist": "Merigus",
-            "src": "musicas/Take me away.mp3",
-            "cover": "musicas/album_cover.jpeg",
-            "lyricsFile": "musicas/Take me away.txt"
+            "title": "The Weight Of Silence",
+            "artist": "MeriguS",
+            "src": "musicas/The Weight of Silence.mp3",
+            "cover": "",
+            "lyricsFile": "musicas/The Weight of Silence.txt"
         }
     ];
 
@@ -259,7 +250,7 @@
     const durTimeEl = document.getElementById('duration');
     const playlistUl = document.getElementById('playlist-ul');
 
-    // Capa única padrão
+    // Capa única padrão (Certifique-se que este arquivo existe na pasta)
     const defaultCover = "musicas/album_cover.jpeg";
 
     let songIndex = 0;
@@ -322,7 +313,7 @@
             })
             .catch(error => {
                 console.error("Erro ao carregar letra:", error);
-                lyricsText.innerText = "Letra não encontrada.\nVerifique se o arquivo .txt está na pasta 'musicas'.";
+                lyricsText.innerText = "Letra não encontrada.\nColoque o arquivo '" + filePath + "' na pasta.";
             });
     }
 
@@ -332,7 +323,7 @@
         artistEl.innerText = song.artist;
         audio.src = encodeURI(song.src);
         
-        // Carrega capa
+        // Carrega capa (se estiver vazia no JSON, usa a default)
         if(song.cover && song.cover.trim() !== "") {
             coverEl.src = song.cover;
         } else {
@@ -340,7 +331,7 @@
         }
         coverEl.onerror = function() { this.src = defaultCover; };
         
-        // Carrega letra
+        // Carrega letra (assumindo que o arquivo .txt tem o mesmo nome do mp3)
         fetchLyrics(song.lyricsFile);
 
         updatePlaylistActiveState();
